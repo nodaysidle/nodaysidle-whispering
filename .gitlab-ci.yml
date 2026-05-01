@@ -32,8 +32,7 @@ verify:web:
   variables:
     npm_config_cache: "$CI_PROJECT_DIR/.npm"
   script:
-    - npm ci
-    - npm run build
+    - bash scripts/ci-local.sh verify
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -45,14 +44,14 @@ package:macos:
     - macos
   variables:
     INSTALL_DIR: "$CI_PROJECT_DIR/.ci-install"
+    WHISPER_MODEL_PATH: "/Users/archuser/.gitlab-runner/models/ggml-base.en-q5_1.bin"
     npm_config_cache: "$CI_PROJECT_DIR/.npm"
   script:
     - node --version
     - npm --version
     - rustc --version
     - cargo --version
-    - npm ci
-    - bash scripts/package-macos.sh
+    - bash scripts/ci-local.sh package
     - APP_PATH="$INSTALL_DIR/NoDaysIdle Whispering.app"
     - test -d "$APP_PATH"
     - ZIP_NAME="NoDaysIdle-Whispering-${CI_COMMIT_TAG:-$CI_COMMIT_SHORT_SHA}.zip"
