@@ -2,6 +2,7 @@ node_modules/
 dist/
 src-tauri/target/
 output/
+.ci-install/
 models/*.bin
 .DS_Store
 *.log

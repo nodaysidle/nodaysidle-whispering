@@ -126,7 +126,15 @@ The repo includes a GitLab pipeline with two jobs:
 - `verify:web` — runs the frontend build on the same self-hosted macOS runner tagged `macos`
 - `package:macos` — builds the native `.app` on that same runner
 
-The macOS packaging job is wired for the same local-first flow as the app itself. If your runner keeps the Whisper model outside the repo checkout, point it at that file with `WHISPER_MODEL_PATH`.
+The same logic is also available locally with:
+
+```bash
+npm run ci:local
+```
+
+That command runs the full verify + package flow end to end on the Mac mini, using the same packaging path as CI. If your runner keeps the Whisper model outside the repo checkout, point it at that file with `WHISPER_MODEL_PATH`.
+
+GitLab.com is currently blocking pipeline execution on this project because the account needs identity verification to run CI jobs, so `npm run ci:local` is the reliable fallback until that gate is cleared.
 
 ## Configuration
 
