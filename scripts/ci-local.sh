@@ -15,6 +15,7 @@ run_verify() {
 run_package() {
   cd "$ROOT_DIR"
   echo "==> package:macos"
+  npm ci
   INSTALL_DIR="$INSTALL_DIR" bash scripts/package-macos.sh
 }
 
