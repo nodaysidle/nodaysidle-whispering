@@ -20,7 +20,8 @@ stages:
 
 verify:web:
   stage: verify
-  image: node:20-bookworm
+  tags:
+    - macos
   cache:
     key:
       files:
