@@ -26,7 +26,7 @@ require_file "$MODEL_PATH"
 
 cd "$ROOT_DIR"
 echo "Building the macOS .app bundle..."
-npm run tauri -- build --bundles app --ci
+npm exec --yes tauri -- build --bundles app --ci
 
 if [[ ! -d "$APP_BUNDLE" ]]; then
   APP_BUNDLE="$(find "$BUNDLE_DIR" -maxdepth 1 -type d -name '*.app' -print -quit)"
