@@ -11,6 +11,7 @@ DEST_APP="$INSTALL_DIR/$APP_NAME.app"
 MODEL_PATH="${MODEL_PATH:-${WHISPER_MODEL_PATH:-$ROOT_DIR/models/ggml-base.en-q5_1.bin}}"
 LOGO_PATH="$SRC_TAURI_DIR/icons/logo.svg"
 ICON_PATH="$SRC_TAURI_DIR/icons/icon.icns"
+REPO_MODEL_PATH="$ROOT_DIR/models/ggml-base.en-q5_1.bin"
 
 require_file() {
   local file_path="$1"
@@ -20,9 +21,19 @@ require_file() {
   fi
 }
 
+ensure_repo_model_path() {
+  mkdir -p "$ROOT_DIR/models"
+  if [[ "$MODEL_PATH" != "$REPO_MODEL_PATH" ]]; then
+    if [[ ! -e "$REPO_MODEL_PATH" ]]; then
+      ln -sf "$MODEL_PATH" "$REPO_MODEL_PATH"
+    fi
+  fi
+}
+
 require_file "$LOGO_PATH"
 require_file "$ICON_PATH"
 require_file "$MODEL_PATH"
+ensure_repo_model_path
 
 cd "$ROOT_DIR"
 echo "Building the macOS .app bundle..."
