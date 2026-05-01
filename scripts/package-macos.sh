@@ -9,6 +9,7 @@ BUNDLE_DIR="$SRC_TAURI_DIR/target/release/bundle/macos"
 APP_BUNDLE="$BUNDLE_DIR/$APP_NAME.app"
 DEST_APP="$INSTALL_DIR/$APP_NAME.app"
 MODEL_PATH="${MODEL_PATH:-${WHISPER_MODEL_PATH:-$ROOT_DIR/models/ggml-base.en-q5_1.bin}}"
+ZIP_OUTPUT="${ZIP_OUTPUT:-}"
 LOGO_PATH="$SRC_TAURI_DIR/icons/logo.svg"
 ICON_PATH="$SRC_TAURI_DIR/icons/icon.icns"
 REPO_MODEL_PATH="$ROOT_DIR/models/ggml-base.en-q5_1.bin"
@@ -75,6 +76,16 @@ fi
 
 echo "Done."
 echo "Installed: $DEST_APP"
+
+if [[ -n "$ZIP_OUTPUT" ]]; then
+  ZIP_DIR="$(dirname "$ZIP_OUTPUT")"
+  mkdir -p "$ZIP_DIR"
+  rm -f "$ZIP_OUTPUT"
+  echo "Creating distributable zip: $ZIP_OUTPUT"
+  ditto -c -k --sequesterRsrc --keepParent "$DEST_APP" "$ZIP_OUTPUT"
+  echo "Zip created: $ZIP_OUTPUT"
+fi
+
 echo "Logo source: $LOGO_PATH"
 echo "Bundle icons: $ICON_PATH and the rest of src-tauri/icons/"
 echo "Model resource: $MODEL_PATH"
