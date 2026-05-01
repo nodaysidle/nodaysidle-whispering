@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>NSMicrophoneUsageDescription</key>
+  <string>NoDaysIdle Whispering captures microphone audio for local dictation.</string>
+  <key>NSAppleEventsUsageDescription</key>
+  <string>NoDaysIdle Whispering can type finalized dictation into the active application.</string>
+</dict>
+</plist>
