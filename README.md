@@ -119,6 +119,15 @@ If you only want the raw bundle output, Tauri writes it here:
 src-tauri/target/release/bundle/macos/NoDaysIdle Whispering.app
 ```
 
+## GitLab CI
+
+The repo includes a GitLab pipeline with two jobs:
+
+- `verify:web` — runs the frontend build on a regular Linux runner
+- `package:macos` — builds the native `.app` on a self-hosted macOS runner tagged `macos`
+
+The macOS packaging job is wired for the same local-first flow as the app itself. If your runner keeps the Whisper model outside the repo checkout, point it at that file with `WHISPER_MODEL_PATH`.
+
 ## Configuration
 
 The app is designed to stay simple:
