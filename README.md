@@ -124,7 +124,7 @@ src-tauri/target/release/bundle/macos/NoDaysIdle Whispering.app
 The repo includes a GitLab pipeline with two jobs:
 
 - `verify:web` — runs the frontend build on the same self-hosted macOS runner tagged `macos`
-- `package:macos` — builds the native `.app` on that same runner
+- `package:macos` — builds the native `.app`, installs it into `.ci-install/NoDaysIdle Whispering.app`, and writes the distributable zip to `artifacts/NoDaysIdle-Whispering-<sha>.zip`
 
 The same logic is also available locally with:
 
@@ -132,7 +132,7 @@ The same logic is also available locally with:
 npm run ci:local
 ```
 
-That command runs the full verify + package flow end to end on the Mac mini, using the same packaging path as CI. If your runner keeps the Whisper model outside the repo checkout, point it at that file with `WHISPER_MODEL_PATH`.
+That command runs the full verify + package flow end to end on the Mac mini, using the same packaging path as CI. If your runner keeps the Whisper model outside the repo checkout, point it at that file with `WHISPER_MODEL_PATH`. If you want the local helper to emit the same zip artifact shape, set `ZIP_OUTPUT` before running the package step.
 
 GitLab.com is currently blocking pipeline execution on this project because the account needs identity verification to run CI jobs, so `npm run ci:local` is the reliable fallback until that gate is cleared.
 
