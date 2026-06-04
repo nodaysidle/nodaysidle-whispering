@@ -49,7 +49,10 @@ export function Controls({
           }
         }}
       >
-        <label id="continuous-mode-label">Continuous Mode</label>
+        <div className="toggle-copy">
+          <label id="continuous-mode-label">Continuous Mode</label>
+          <span>Keep listening and split speech with VAD.</span>
+        </div>
         <div className="slider-container">
           <input
             type="checkbox"

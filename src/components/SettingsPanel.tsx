@@ -13,6 +13,7 @@ interface SettingsPanelProps {
   onVadChange: (enabled: boolean) => void;
   onLoadModel: () => void;
   onRegisterHotkey: () => void;
+  onResetDefaults: () => void;
   // Insertion mode is no longer part of the UI to simplify it.
   // We keep the props for potential future use or to avoid breaking App.tsx immediately.
   insertionMode: InsertionMode;
@@ -46,6 +47,7 @@ export function SettingsPanel({
   onVadChange,
   onLoadModel,
   onRegisterHotkey,
+  onResetDefaults,
 }: SettingsPanelProps) {
   const isDisabled = busy || captureActive;
 
@@ -56,6 +58,15 @@ export function SettingsPanel({
 
   return (
     <fieldset disabled={isDisabled} className="settings-panel">
+      <div className="settings-heading">
+        <div>
+          <h2>Capture setup</h2>
+          <p>Load the bundled model, set language, then register push-to-talk.</p>
+        </div>
+        <button type="button" className="ghost-button settings-reset" onClick={onResetDefaults} disabled={busy}>
+          Reset defaults
+        </button>
+      </div>
       <div className="field-group">
         <label htmlFor="model-path">Model Path</label>
         <input
@@ -100,7 +111,7 @@ export function SettingsPanel({
           onChange={(e) => onHotkeyChange(e.target.value)}
           placeholder="control+shift+Space"
         />
-        <p className="field-hint">Use the format expected by global-hotkey, for example <code>control+shift+Space</code>.</p>
+        <p className="field-hint">Default: <code>control+shift+Space</code>. macOS may require Accessibility permission for global hotkeys and text insertion.</p>
       </div>
       <button
         onClick={onRegisterHotkey}

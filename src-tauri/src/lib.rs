@@ -51,7 +51,7 @@ impl AppState {
                 None
             }
         };
-        let hotkeys = HotkeyController::new()?;
+        let hotkeys = HotkeyController::new();
         let error_status = Arc::clone(&handles.status);
         let error_control = Arc::clone(&handles.control);
         let audio_error_thread = thread::Builder::new()

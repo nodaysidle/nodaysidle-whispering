@@ -22,8 +22,8 @@ export function MetricsBar({
 }: MetricsBarProps) {
   return (
     <>
-      <Metric value={`${latencyMs.toFixed(0)}`} label="Latency (ms)" />
-      <Metric value={`${chunkProcessingMs.toFixed(0)}`} label="Chunk (ms)" />
+      <Metric value={latencyMs > 0 ? `${latencyMs.toFixed(0)}` : "—"} label="Latency (ms)" />
+      <Metric value={chunkProcessingMs > 0 ? `${chunkProcessingMs.toFixed(0)}` : "—"} label="Chunk (ms)" />
       <Metric value={wordCount} label="Words" />
       <Metric value={characterCount} label="Characters" />
     </>

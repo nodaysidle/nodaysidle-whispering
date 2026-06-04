@@ -6,3 +6,4 @@ output/
 models/*.bin
 .DS_Store
 *.log
+artifacts/

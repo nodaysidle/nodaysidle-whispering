@@ -55,9 +55,15 @@ type ToastKind = "success" | "error";
 const DEFAULT_HOTKEY = "control+shift+Space";
 
 function formatModelLabel(modelPath: string | null) {
-  if (!modelPath) return "Bundled model";
+  if (!modelPath) return "Bundled base model";
   const segments = modelPath.split(/[\\/]/).filter(Boolean);
-  return segments[segments.length - 1] ?? modelPath;
+  const filename = segments[segments.length - 1] ?? modelPath;
+  return filename
+    .replace(/^ggml-/i, "")
+    .replace(/\.bin$/i, "")
+    .replace(/[-_]+/g, " ")
+    .replace(/\bq(\d)/gi, "Q$1")
+    .trim();
 }
 
 function formatHotkeyLabel(hotkey: string) {
@@ -242,7 +248,9 @@ export default function App() {
             <h1>NoDaysIdle Whispering</h1>
             <p className="header-subtitle">Minimal, local-first dictation with a private transcript vault.</p>
             <div className="header-chips">
-              <span className="header-chip">{status.modelLoaded ? "Model ready" : "Model idle"}</span>
+              <span className={`header-chip ${status.modelLoaded ? "is-ready" : "is-warning"}`}>
+                {status.modelLoaded ? "Model loaded" : "No model loaded"}
+              </span>
               <span className="header-chip">{formatModelLabel(status.modelPath)}</span>
               <span className="header-chip">{formatHotkeyLabel(hotkey)}</span>
             </div>
@@ -276,7 +284,7 @@ export default function App() {
               runAction(startRecording, undefined, "Starting capture")
             }
             onStop={() =>
-              runAction(stopRecording, undefined, "Finalizing audio")
+              runAction(stopRecording, "Transcript finalized and saved to the vault.", "Finalizing audio")
             }
             onContinuousChange={(enabled) =>
               runAction(
@@ -297,6 +305,7 @@ export default function App() {
               onArchiveDraft={handleArchiveDraft}
               onReset={() => {
                 archiveDraftSilently();
+                setToast({ kind: "success", message: "Transcript archived in the vault before clearing." });
                 runAction(resetTranscript, undefined, "Clearing transcript");
               }}
             />
@@ -338,6 +347,12 @@ export default function App() {
                     "Registering hotkey",
                   )
                 }
+                onResetDefaults={() => {
+                  setModelPath("");
+                  setLanguage("auto");
+                  setHotkey(DEFAULT_HOTKEY);
+                  setToast({ kind: "success", message: "Settings reset to app defaults." });
+                }}
                 onVadChange={(enabled) =>
                   runAction(
                     () => setVadEnabled(enabled),

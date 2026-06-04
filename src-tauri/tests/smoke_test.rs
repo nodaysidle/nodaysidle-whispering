@@ -31,7 +31,7 @@ fn smoke_test_app_launches() {
         bundle_path.push("NoDaysIdle Whispering.app");
         bundle_path.push("Contents");
         bundle_path.push("MacOS");
-        bundle_path.push("NoDaysIdle Whispering");
+        bundle_path.push(exe_name);
 
         if bundle_path.exists() {
             exe_path = bundle_path;

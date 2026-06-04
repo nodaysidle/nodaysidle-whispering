@@ -1,32 +1,46 @@
 use crate::types::HotkeyUpdate;
 use crate::AppState;
 use global_hotkey::{GlobalHotKeyEvent, GlobalHotKeyManager, HotKeyState};
+use log::warn;
 use std::str::FromStr;
 use tauri::{AppHandle, Emitter, Manager};
 
 pub struct HotkeyController {
-    manager: GlobalHotKeyManager,
+    manager: Option<GlobalHotKeyManager>,
     current: Option<global_hotkey::hotkey::HotKey>,
 }
 
 impl HotkeyController {
-    pub fn new() -> Result<Self, String> {
-        Ok(Self {
-            manager: GlobalHotKeyManager::new()
-                .map_err(|error| format!("Could not initialize global hotkey manager: {error}"))?,
+    pub fn new() -> Self {
+        let manager = match GlobalHotKeyManager::new() {
+            Ok(manager) => Some(manager),
+            Err(error) => {
+                warn!("Global hotkeys unavailable: {error}");
+                None
+            }
+        };
+
+        Self {
+            manager,
             current: None,
-        })
+        }
     }
 
     pub fn register(&mut self, value: &str) -> Result<(), String> {
+        let Some(manager) = self.manager.as_ref() else {
+            return Err(
+                "Global hotkeys are unavailable. Grant Accessibility permission to NoDaysIdle Whispering in macOS System Settings, then restart the app.".to_string(),
+            );
+        };
+
         let hotkey = global_hotkey::hotkey::HotKey::from_str(value)
             .map_err(|error| format!("Invalid hotkey \"{value}\": {error}"))?;
-        self.manager
+        manager
             .register(hotkey)
             .map_err(|error| format!("Could not register hotkey {value}: {error}"))?;
 
         if let Some(current) = self.current.replace(hotkey) {
-            let _ = self.manager.unregister(current);
+            let _ = manager.unregister(current);
         }
 
         Ok(())

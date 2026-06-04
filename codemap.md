@@ -31,7 +31,7 @@
 ## Data & Control Flow
 1. `src/main.tsx` mounts `App`, which loads initial dictation status and subscribes to Tauri events.
 2. UI actions in `App.tsx` call wrappers in `src/tauri.ts`, which invoke Rust commands such as `load_model`, `start_recording`, `set_continuous_mode`, and `register_push_to_talk_hotkey`.
-3. `src-tauri/src/lib.rs` manages shared `AppState`, starts audio capture, spawns the transcription pipeline threads, and exposes command handlers from `src-tauri/src/commands.rs`.
+3. `src-tauri/src/main.rs` registers Tauri commands; `src-tauri/src/lib.rs` manages shared `AppState`, starts audio capture, and spawns the transcription pipeline threads.
 4. `src-tauri/src/pipeline.rs` consumes audio frames, applies VAD, sends inference jobs to Whisper, then emits `dictation:update`, `dictation:hotkey`, and `dictation:error` events back to the frontend.
 5. Final or partial transcription text is either displayed in the UI, copied/pasted, or injected into the active application depending on insertion mode.
 
@@ -53,7 +53,7 @@
 - `src-tauri/tauri.conf.json` — Tauri app metadata, build hooks, CSP, window settings, and bundle config
 - `src-tauri/Cargo.toml` — Rust dependencies for audio, hotkeys, injection, and Whisper inference
 - `src-tauri/src/lib.rs` — native app state, startup, shutdown, and Tauri command registration
-- `src-tauri/src/commands.rs` — Tauri command handlers used by the frontend
+- `src-tauri/src/main.rs` — Tauri command handlers used by the frontend
 - `src-tauri/src/pipeline.rs` — rolling-buffer transcription pipeline, VAD/inference scheduling, and event emission
 
 ## Commands

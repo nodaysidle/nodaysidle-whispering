@@ -4,12 +4,21 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 INSTALL_DIR="${INSTALL_DIR:-$ROOT_DIR/.ci-install}"
 STEP="${1:-all}"
+CARGO_BIN="${CARGO_BIN:-$(command -v cargo || true)}"
+if [[ -z "$CARGO_BIN" && -x "$HOME/.cargo/bin/cargo" ]]; then
+  CARGO_BIN="$HOME/.cargo/bin/cargo"
+fi
 
 run_verify() {
   cd "$ROOT_DIR"
   echo "==> verify:web"
   npm ci
   npm run build
+  if [[ -z "$CARGO_BIN" ]]; then
+    echo "cargo is required for Rust tests but was not found" >&2
+    exit 1
+  fi
+  "$CARGO_BIN" test --manifest-path src-tauri/Cargo.toml
 }
 
 run_package() {

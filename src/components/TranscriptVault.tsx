@@ -30,6 +30,23 @@ export function TranscriptVaultPanel({
   onClearArchive,
 }: TranscriptVaultPanelProps) {
   const [search, setSearch] = useState("");
+  const [expandedEntryIds, setExpandedEntryIds] = useState<Set<string>>(() => new Set());
+
+  const requestClearArchive = () => {
+    if (!vault.entries.length) return;
+    if (window.confirm("Clear every saved transcript from this local vault?")) {
+      onClearArchive();
+    }
+  };
+
+  const toggleExpanded = (id: string) => {
+    setExpandedEntryIds((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   const filteredEntries = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -83,9 +100,11 @@ export function TranscriptVaultPanel({
           aria-label="Search saved transcripts"
           className="neumorphic-pressed"
         />
-        <button type="button" className="ghost-button" onClick={onClearArchive} disabled={!vault.entries.length}>
-          Clear history
-        </button>
+        {vault.entries.length > 0 ? (
+          <button type="button" className="ghost-button danger" onClick={requestClearArchive}>
+            Clear history
+          </button>
+        ) : null}
       </div>
 
       <div className="vault-list">
@@ -98,8 +117,13 @@ export function TranscriptVaultPanel({
                   {entry.wordCount} words · {entry.language} · {formatTimestamp(entry.updatedAt)}
                 </span>
               </div>
-              <p>{entry.text}</p>
+              <p>{expandedEntryIds.has(entry.id) || entry.text.length <= 220 ? entry.text : `${entry.text.slice(0, 220).trim()}…`}</p>
               <div className="vault-entry__actions">
+                {entry.text.length > 220 ? (
+                  <button type="button" className="ghost-button" onClick={() => toggleExpanded(entry.id)}>
+                    {expandedEntryIds.has(entry.id) ? "Show less" : "Show more"}
+                  </button>
+                ) : null}
                 <button type="button" className="ghost-button" onClick={() => onCopyText(entry.text)}>
                   Copy
                 </button>

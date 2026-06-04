@@ -2,6 +2,9 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+if [[ -d "$HOME/.cargo/bin" ]]; then
+  export PATH="$HOME/.cargo/bin:$PATH"
+fi
 APP_NAME="NoDaysIdle Whispering"
 INSTALL_DIR="${INSTALL_DIR:-/Applications}"
 SRC_TAURI_DIR="$ROOT_DIR/src-tauri"
@@ -73,6 +76,10 @@ else
     exit 1
   fi
 fi
+
+echo "Signing installed app bundle..."
+codesign --force --deep --sign - --entitlements "$SRC_TAURI_DIR/entitlements.plist" "$DEST_APP"
+codesign --verify --deep --strict --verbose=2 "$DEST_APP"
 
 echo "Done."
 echo "Installed: $DEST_APP"
