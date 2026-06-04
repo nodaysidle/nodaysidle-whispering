@@ -30,6 +30,7 @@ verify:web:
       - .npm/
     policy: pull-push
   variables:
+    WHISPER_MODEL_PATH: "/Users/archuser/.gitlab-runner/models/ggml-base.en-q5_1.bin"
     npm_config_cache: "$CI_PROJECT_DIR/.npm"
   script:
     - bash scripts/ci-local.sh verify
