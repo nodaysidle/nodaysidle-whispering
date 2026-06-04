@@ -4,6 +4,7 @@ src-tauri/target/
 output/
 .ci-install/
 models/*.bin
+models/.cache/
 .DS_Store
 *.log
 artifacts/

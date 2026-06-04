@@ -94,7 +94,11 @@ fn set_clipboard_text(text: &str) -> Result<(), String> {
 
 #[cfg(target_os = "macos")]
 fn applescript_keystroke(text: &str) -> Result<(), String> {
-    let escaped = text.replace('\\', "\\\\").replace('"', "\\\"");
+    let escaped = text
+        .replace('\\', "\\\\")
+        .replace('"', "\\\"")
+        .replace('\n', "\\n")
+        .replace('\r', "\\r");
     let script = format!("tell application \"System Events\" to keystroke \"{escaped}\"");
     run_osascript(&script)
 }

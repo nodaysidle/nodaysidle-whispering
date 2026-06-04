@@ -8,52 +8,37 @@
   <img src="https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB" alt="React badge" />
   <img src="https://img.shields.io/badge/macOS-111827?logo=apple&logoColor=white" alt="macOS badge" />
   <img src="https://img.shields.io/badge/Local--first-0F172A?logo=files&logoColor=white" alt="Local-first badge" />
-  <img src="https://img.shields.io/badge/GitLab-Project-FC6D26?logo=gitlab&logoColor=white" alt="GitLab badge" />
+  <img src="https://img.shields.io/badge/GitLab-Ready-FC6D26?logo=gitlab&logoColor=white" alt="GitLab ready badge" />
 </p>
 
 # NoDaysIdle Whispering
 
-A local-first, privacy-preserving dictation app for macOS.
+NoDaysIdle Whispering is a local-first macOS dictation app with a native Tauri shell, a Rust audio/transcription backend, and a React transcript vault.
 
-It gives you:
-- fast push-to-talk transcription
-- a premium minimalist UI
-- a local transcript vault for saving, searching, pinning, copying, and archiving text
-- native `.app` packaging for the Mac `/Applications` folder
-
-The app is built with:
-- Tauri 2
-- Rust backend
-- React + TypeScript frontend
-- a bundled local Whisper model
-
-## What this app is for
-
-NoDaysIdle Whispering is meant to feel like a serious macOS utility, not a toy demo.
-
-Use it when you want to:
-- dictate directly into another app
-- keep a private local transcript history
-- review or copy recent dictation without leaving the app
-- ship a native desktop app that can be installed like a normal Mac application
+It is built for:
+- fast push-to-talk dictation
+- private local transcription
+- searchable local transcript history
+- native `.app` packaging for macOS
+- GitLab release packaging from a self-hosted macOS runner
 
 ## Features
 
 - **Local-first transcription** — speech stays on your machine.
-- **Global hotkey** — start and stop dictation from anywhere.
-- **Transcript vault** — save, search, pin, archive, and copy transcript entries.
-- **Premium dark UI** — minimalist surfaces, compact status chips, and a cleaner workflow.
-- **Native macOS bundle** — build a real `.app` and install it into `/Applications`.
-- **Logo included** — the app uses the branded logo from `src-tauri/icons/logo.svg` and the bundled icon set in `src-tauri/icons/`.
+- **Bundled Whisper model support** — package `models/ggml-base.en-q5_1.bin` into the app bundle.
+- **Global hotkey** — register a push-to-talk shortcut from the app settings.
+- **Transcript vault** — save, search, pin, archive, copy, and clear transcript entries.
+- **Native text insertion** — supports final paste and backend insertion modes.
+- **Premium dark UI** — compact macOS utility layout with status chips and live metrics.
+- **Native macOS bundle** — builds `NoDaysIdle Whispering.app`.
 
 ## Requirements
 
-Before you build or run the app, install:
-
-- **macOS 14+**
-- **Node.js 20+**
-- **Rust** via [rustup](https://rustup.rs/)
-- a local Whisper model file
+- macOS 14+
+- Node.js 20+
+- Rust via [rustup](https://rustup.rs/)
+- Tauri prerequisites for macOS
+- Whisper model file at `models/ggml-base.en-q5_1.bin`, or an external model path passed through `WHISPER_MODEL_PATH`
 
 The default bundled model path is:
 
@@ -61,7 +46,7 @@ The default bundled model path is:
 models/ggml-base.en-q5_1.bin
 ```
 
-If you want to use a different model, point the app at another local file in Settings.
+The model binary is intentionally ignored by git.
 
 ## Screenshot
 
@@ -74,22 +59,48 @@ If you want to use a different model, point the app at another local file in Set
 - `src/` — React + TypeScript frontend
 - `src/components/` — UI components
 - `src/lib/` — local transcript vault helpers
-- `src-tauri/` — Rust backend and Tauri config
+- `src-tauri/` — Rust backend, Tauri config, entitlements, tests
 - `src-tauri/icons/` — logo and app icon assets
-- `models/` — local Whisper model files
+- `models/` — local Whisper model files, ignored by git
+- `scripts/` — local CI and macOS packaging scripts
+- `.gitlab-ci.yml` — GitLab verify/package pipeline for macOS runner
 
-## Run in development
-
-From the project root:
+## Install dependencies
 
 ```bash
 npm install
-npm run tauri -- dev
+```
+
+## Run in development
+
+```bash
+npm run tauri dev
 ```
 
 That starts the Vite frontend and launches the Tauri shell around it.
 
-## Build and install the native Mac app
+## Verify locally
+
+Run the frontend build and Rust test suite:
+
+```bash
+npm run ci:verify
+```
+
+Equivalent manual commands:
+
+```bash
+npm run build
+cargo test --manifest-path src-tauri/Cargo.toml
+```
+
+If `cargo` is installed through rustup but not on `PATH`, export it first:
+
+```bash
+export PATH="$HOME/.cargo/bin:$PATH"
+```
+
+## Build and package the native Mac app
 
 Use the packaging script to build the `.app` and copy it into `/Applications`:
 
@@ -98,22 +109,33 @@ npm run package:mac
 ```
 
 What the script does:
-1. checks that the logo and icon assets exist
-2. checks that the bundled Whisper model exists
+1. verifies the logo and icon assets exist
+2. verifies the Whisper model exists
 3. builds the release `.app` bundle with Tauri
-4. installs `NoDaysIdle Whispering.app` into `/Applications`
+4. installs `NoDaysIdle Whispering.app`
+5. ad-hoc signs and verifies the installed app bundle
 
-The resulting bundle is installed here:
+Default install target:
 
 ```text
 /Applications/NoDaysIdle Whispering.app
 ```
 
-If `/Applications` is not writable, the script uses `sudo` for the final install step.
+Use `INSTALL_DIR` to package into a local directory instead:
 
-## Manual build location
+```bash
+INSTALL_DIR="$PWD/.ci-install" npm run package:mac
+```
 
-If you only want the raw bundle output, Tauri writes it here:
+Use `ZIP_OUTPUT` to create a distributable zip:
+
+```bash
+INSTALL_DIR="$PWD/.ci-install" \
+ZIP_OUTPUT="$PWD/artifacts/NoDaysIdle-Whispering-local.zip" \
+npm run package:mac
+```
+
+Raw Tauri app bundle output:
 
 ```text
 src-tauri/target/release/bundle/macos/NoDaysIdle Whispering.app
@@ -121,46 +143,75 @@ src-tauri/target/release/bundle/macos/NoDaysIdle Whispering.app
 
 ## GitLab CI
 
-The repo includes a GitLab pipeline with two jobs:
+The pipeline has two stages on a self-hosted macOS runner tagged `macos`:
 
-- `verify:web` — runs the frontend build on the same self-hosted macOS runner tagged `macos`
-- `package:macos` — builds the native `.app`, installs it into `.ci-install/NoDaysIdle Whispering.app`, and writes the distributable zip to `artifacts/NoDaysIdle-Whispering-<sha>.zip`
+- `verify:web` — installs dependencies, builds the frontend, verifies the model path, and runs Rust tests.
+- `package:macos` — builds the native `.app`, installs it into `.ci-install/NoDaysIdle Whispering.app`, and uploads `artifacts/NoDaysIdle-Whispering-<sha-or-tag>.zip`.
 
-The same logic is also available locally with:
+Model handling:
+- If `models/ggml-base.en-q5_1.bin` exists in the checkout, CI uses it.
+- If the model is stored outside the checkout, set `WHISPER_MODEL_PATH` in GitLab CI/CD variables.
+- The repo does not hardcode machine-specific model paths.
+
+Local equivalent:
 
 ```bash
 npm run ci:local
 ```
 
-That command runs the full verify + package flow end to end on the Mac mini, using the same packaging path as CI. If your runner keeps the Whisper model outside the repo checkout, point it at that file with `WHISPER_MODEL_PATH`. If you want the local helper to emit the same zip artifact shape, set `ZIP_OUTPUT` before running the package step.
-
-GitLab.com is currently blocking pipeline execution on this project because the account needs identity verification to run CI jobs, so `npm run ci:local` is the reliable fallback until that gate is cleared.
+GitLab.com may block pipeline execution until the account completes identity verification. Until that gate is cleared, `npm run ci:local` is the reliable fallback on the Mac mini.
 
 ## Configuration
 
-The app is designed to stay simple:
+- **Model path** — leave blank to use the bundled model, or set a local file path in Settings.
+- **Language** — use automatic detection or choose a supported language.
+- **Hotkey** — default is `control+shift+Space`.
+- **VAD** — toggle voice activity detection.
+- **Transcript vault** — use it as a local dictation scratchpad and history.
 
-- **Model path** — set your local Whisper model path in Settings.
-- **Hotkey** — change the global push-to-talk shortcut.
-- **VAD** — toggle voice activity detection on or off.
-- **Transcript vault** — use it as your local dictation scratchpad and history.
+## macOS permissions
+
+For global hotkeys, keyboard insertion, and microphone capture, macOS may require:
+
+- Microphone permission
+- Accessibility permission
+- Input Monitoring permission
+
+Grant permissions in System Settings if recording, hotkeys, or text insertion do not work.
 
 ## Troubleshooting
 
 - **Build fails because of a missing model**
-  - Make sure `models/ggml-base.en-q5_1.bin` exists, or update the model path in Settings.
+  - Put `ggml-base.en-q5_1.bin` in `models/`, or set `WHISPER_MODEL_PATH=/path/to/model.bin`.
+- **`cargo` is not found**
+  - Run `export PATH="$HOME/.cargo/bin:$PATH"`, then retry.
 - **Install to `/Applications` fails**
-  - Run the packaging command from an admin-capable account, or let the script prompt for `sudo`.
+  - Run the packaging command from an admin-capable account, or use `INSTALL_DIR="$PWD/.ci-install"`.
+- **Global hotkey does not fire**
+  - Grant Accessibility/Input Monitoring permissions and re-register the hotkey.
+- **Text insertion fails**
+  - Grant Accessibility permission. The app falls back to AppleScript insertion on macOS.
 - **App icon looks wrong**
-  - The icon is generated from the branded assets in `src-tauri/icons/`; rebuild after replacing them.
+  - Rebuild after replacing assets in `src-tauri/icons/`.
 
-## Install target
+## Verified release checks
 
-The expected end state is always the same:
+Before pushing a release, run:
 
-- a packaged macOS `.app`
-- branded with the project logo
-- installed at `/Applications/NoDaysIdle Whispering.app`
+```bash
+npm run build
+cargo test --manifest-path src-tauri/Cargo.toml
+INSTALL_DIR="$PWD/.ci-install" \
+ZIP_OUTPUT="$PWD/artifacts/NoDaysIdle-Whispering-local.zip" \
+npm run package:mac
+```
+
+Expected artifacts:
+
+```text
+.ci-install/NoDaysIdle Whispering.app
+artifacts/NoDaysIdle-Whispering-local.zip
+```
 
 ## Credits
 

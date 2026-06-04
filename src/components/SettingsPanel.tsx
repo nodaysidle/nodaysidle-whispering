@@ -1,5 +1,3 @@
-import type { InsertionMode } from "../types";
-
 interface SettingsPanelProps {
   modelPath: string;
   language: string;
@@ -14,10 +12,6 @@ interface SettingsPanelProps {
   onLoadModel: () => void;
   onRegisterHotkey: () => void;
   onResetDefaults: () => void;
-  // Insertion mode is no longer part of the UI to simplify it.
-  // We keep the props for potential future use or to avoid breaking App.tsx immediately.
-  insertionMode: InsertionMode;
-  onInsertionModeChange: (mode: InsertionMode) => void;
 }
 
 const COMMON_LANGUAGES = [

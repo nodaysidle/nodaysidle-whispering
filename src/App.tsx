@@ -21,7 +21,6 @@ import {
   registerHotkey,
   resetTranscript,
   setContinuousMode,
-  setInsertionMode,
   setVadEnabled,
   isTauriRuntime,
   startRecording,
@@ -30,7 +29,6 @@ import {
 import type {
   DictationStatus,
   HotkeyUpdate,
-  InsertionMode,
   TranscriptionUpdate,
 } from "./types";
 
@@ -88,7 +86,11 @@ export default function App() {
   const dismissToast = useCallback(() => setToast(null), []);
 
   useEffect(() => {
-    saveTranscriptVaultState(vault);
+    const saveTimer = window.setTimeout(() => {
+      saveTranscriptVaultState(vault);
+    }, 500);
+
+    return () => window.clearTimeout(saveTimer);
   }, [vault]);
 
   useEffect(() => {
@@ -304,9 +306,11 @@ export default function App() {
               onCopyText={() => handleCopyText(liveTranscript)}
               onArchiveDraft={handleArchiveDraft}
               onReset={() => {
-                archiveDraftSilently();
-                setToast({ kind: "success", message: "Transcript archived in the vault before clearing." });
-                runAction(resetTranscript, undefined, "Clearing transcript");
+                runAction(
+                  resetTranscript,
+                  "Transcript cleared and archived to the vault.",
+                  "Clearing transcript",
+                );
               }}
             />
           </div>
@@ -326,7 +330,6 @@ export default function App() {
                 modelPath={modelPath}
                 language={language}
                 vadEnabled={status.vadEnabled}
-                insertionMode={status.insertionMode}
                 hotkey={hotkey}
                 captureActive={status.recording || status.continuousMode}
                 busy={busyAction !== null}
@@ -358,13 +361,6 @@ export default function App() {
                     () => setVadEnabled(enabled),
                     undefined,
                     "Updating VAD",
-                  )
-                }
-                onInsertionModeChange={(mode: InsertionMode) =>
-                  runAction(
-                    () => setInsertionMode(mode),
-                    undefined,
-                    "Updating insertion",
                   )
                 }
               />
