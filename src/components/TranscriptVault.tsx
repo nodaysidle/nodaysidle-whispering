@@ -39,6 +39,12 @@ export function TranscriptVaultPanel({
     }
   };
 
+  const requestDeleteEntry = (id: string, title: string) => {
+    if (window.confirm(`Delete "${title}"?`)) {
+      onDeleteEntry(id);
+    }
+  };
+
   const toggleExpanded = (id: string) => {
     setExpandedEntryIds((current) => {
       const next = new Set(current);
@@ -67,48 +73,64 @@ export function TranscriptVaultPanel({
     <section className="vault-panel neumorphic-raised">
       <div className="panel-header">
         <div>
+          <span className="eyebrow">VAULT</span>
           <h2>Transcript Vault</h2>
-          <p>Local autosave for finished dictation. Minimal friction. Maximum recovery.</p>
+          <p>Automatically saved transcripts</p>
         </div>
         <span className="vault-pill">{vault.entries.length} saved</span>
       </div>
 
-      <div className="vault-live-card neumorphic-pressed">
+      <div className={`vault-live-card neumorphic-pressed ${liveText ? "has-live-text" : "is-empty"}`}>
         <div className="vault-live-card__topline">
           <span className="vault-label">Current cache</span>
           <span className="vault-timestamp">{formatTimestamp(vault.draftUpdatedAt)}</span>
         </div>
-        <div className="vault-live-card__body">
-          {liveText ? liveText : "No active transcript right now."}
-        </div>
-        <div className="vault-live-card__footer">
-          <button type="button" className="ghost-button" onClick={() => onCopyText(liveText)} disabled={!liveText}>
-            Copy live
-          </button>
-          <button type="button" className="ghost-button" onClick={onArchiveDraft} disabled={!liveText}>
-            Save snapshot
-          </button>
-        </div>
+        {liveText ? (
+          <>
+            <div className="vault-live-card__body">{liveText}</div>
+            <div className="vault-live-card__footer">
+              <button type="button" className="ghost-button" onClick={() => onCopyText(liveText)}>
+                Copy live
+              </button>
+              <button type="button" className="ghost-button" onClick={onArchiveDraft}>
+                Save snapshot
+              </button>
+            </div>
+          </>
+        ) : (
+          <div className="vault-live-card__empty">No active transcript</div>
+        )}
       </div>
 
       <div className="vault-toolbar">
-        <input
-          type="search"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          placeholder="Search saved transcripts"
-          aria-label="Search saved transcripts"
-          className="neumorphic-pressed"
-        />
-        {vault.entries.length > 0 ? (
-          <button type="button" className="ghost-button danger" onClick={requestClearArchive}>
-            Clear history
-          </button>
-        ) : null}
+        <div className="search-shell">
+          <span aria-hidden="true">⌕</span>
+          <input
+            type="search"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Search saved transcripts"
+            aria-label="Search saved transcripts"
+            className="neumorphic-pressed"
+          />
+        </div>
+        <button type="button" className="ghost-button danger" onClick={requestClearArchive} disabled={!vault.entries.length}>
+          Clear history
+        </button>
       </div>
 
       <div className="vault-list">
-        {filteredEntries.length ? (
+        {vault.entries.length === 0 ? (
+          <div className="vault-empty">
+            <strong>No saved transcripts yet.</strong>
+            <span>Finish a dictation session and it will land here automatically.</span>
+          </div>
+        ) : filteredEntries.length === 0 ? (
+          <div className="vault-empty">
+            <strong>No results for “{search}”.</strong>
+            <span>Try a different search term.</span>
+          </div>
+        ) : (
           filteredEntries.map((entry) => (
             <article key={entry.id} className={`vault-entry neumorphic-pressed ${entry.pinned ? "is-pinned" : ""}`}>
               <div className="vault-entry__meta">
@@ -130,19 +152,12 @@ export function TranscriptVaultPanel({
                 <button type="button" className="ghost-button" onClick={() => onTogglePin(entry.id)}>
                   {entry.pinned ? "Unpin" : "Pin"}
                 </button>
-                <button type="button" className="ghost-button danger" onClick={() => onDeleteEntry(entry.id)}>
+                <button type="button" className="ghost-button danger" onClick={() => requestDeleteEntry(entry.id, entry.title)}>
                   Delete
                 </button>
               </div>
             </article>
           ))
-        ) : (
-          <div className="vault-empty">
-            <strong>No saved transcripts yet.</strong>
-            <span>
-              Finish a dictation session and it will automatically land here as a recovery snapshot.
-            </span>
-          </div>
         )}
       </div>
     </section>

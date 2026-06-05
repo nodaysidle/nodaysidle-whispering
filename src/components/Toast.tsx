@@ -15,7 +15,7 @@ export function Toast({ message, kind, onClose }: ToastProps) {
     setVisible(true);
     const timer = setTimeout(() => {
       setVisible(false);
-      onClose();
+      window.setTimeout(onClose, 200);
     }, 5000);
 
     return () => clearTimeout(timer);
@@ -26,7 +26,7 @@ export function Toast({ message, kind, onClose }: ToastProps) {
   return (
     <div className={`toast toast--${kind} ${visible ? "is-visible" : ""}`} role="status" aria-live="polite">
       <p>{message}</p>
-      <button type="button" onClick={() => { setVisible(false); onClose(); }} aria-label="Dismiss notification">&times;</button>
+      <button type="button" onClick={() => { setVisible(false); window.setTimeout(onClose, 200); }} aria-label="Dismiss notification">&times;</button>
     </div>
   );
 }

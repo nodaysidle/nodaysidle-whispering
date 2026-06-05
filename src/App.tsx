@@ -1,7 +1,6 @@
 import { listen } from "@tauri-apps/api/event";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controls } from "./components/Controls";
-import { MetricsBar } from "./components/MetricsBar";
 import { SettingsPanel } from "./components/SettingsPanel";
 import { Toast } from "./components/Toast";
 import { TranscriptVaultPanel } from "./components/TranscriptVault";
@@ -80,6 +79,7 @@ export default function App() {
   const [language, setLanguage] = useState("auto");
   const [hotkey, setHotkey] = useState(DEFAULT_HOTKEY);
   const [hotkeyPressed, setHotkeyPressed] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [busyAction, setBusyAction] = useState<string | null>(null);
   const [toast, setToast] = useState<{ kind: ToastKind; message: string } | null>(null);
   const [vault, setVault] = useState(() => loadTranscriptVaultState());
@@ -98,6 +98,7 @@ export default function App() {
       .then((next) => {
         setStatus(next);
         setLanguage(next.language);
+        setSettingsOpen(!next.modelLoaded);
         if (next.modelPath) setModelPath(next.modelPath);
         if (next.hotkey) setHotkey(next.hotkey);
       })
@@ -245,10 +246,11 @@ export default function App() {
   return (
     <main className="app-shell">
       <div className="workbench">
-        <div className="header neumorphic-raised">
-          <div>
-            <h1>NoDaysIdle Whispering</h1>
-            <p className="header-subtitle">Minimal, local-first dictation with a private transcript vault.</p>
+        <div className="header command-header neumorphic-raised">
+          <div className="brand-block">
+            <span className="eyebrow">NODAYSIDLE PRIVATE DICTATION</span>
+            <h1><span className="brand-mark">NoDaysIdle</span> Whispering</h1>
+            <p className="header-subtitle">Local dictation. Private vault.</p>
             <div className="header-chips">
               <span className={`header-chip ${status.modelLoaded ? "is-ready" : "is-warning"}`}>
                 {status.modelLoaded ? "Model loaded" : "No model loaded"}
@@ -261,27 +263,34 @@ export default function App() {
             className={`status-indicator ${
               status.recording || status.continuousMode ? "is-live" : ""
             }`}
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
           >
             <span className="dot"></span>
             <span>{activity}</span>
           </div>
         </div>
 
-        <div className="metrics-bar neumorphic-raised">
-          <MetricsBar
-            latencyMs={status.latencyMs}
-            chunkProcessingMs={status.chunkProcessingMs}
-            wordCount={transcriptStats.words}
-            characterCount={transcriptStats.characters}
-          />
-        </div>
-
-        <div className="neumorphic-raised">
+        <section className="command-deck neumorphic-raised">
+          {!status.modelLoaded ? (
+            <div className="first-run-card">
+              <div>
+                <span className="eyebrow">FIRST RUN</span>
+                <h2>Load the local Whisper model first.</h2>
+                <p>Then register the hotkey and start dictating. No cloud. No transcript leak.</p>
+              </div>
+              <button type="button" className="settings-button first-run-action" onClick={() => setSettingsOpen(true)}>
+                Open setup
+              </button>
+            </div>
+          ) : null}
           <Controls
             recording={status.recording}
             continuousMode={status.continuousMode}
             modelLoaded={status.modelLoaded}
             busy={busyAction !== null}
+            hotkeyLabel={formatHotkeyLabel(hotkey)}
             onStart={() =>
               runAction(startRecording, undefined, "Starting capture")
             }
@@ -296,13 +305,17 @@ export default function App() {
               )
             }
           />
-        </div>
+        </section>
 
         <div className="content-grid">
           <div className="transcript-container neumorphic-raised">
             <TranscriptView
               finalText={status.finalizedText}
               partialText={status.partialText}
+              modelLoaded={status.modelLoaded}
+              hotkeyLabel={formatHotkeyLabel(hotkey)}
+              wordCount={transcriptStats.words}
+              characterCount={transcriptStats.characters}
               onCopyText={() => handleCopyText(liveTranscript)}
               onArchiveDraft={handleArchiveDraft}
               onReset={() => {
@@ -325,12 +338,15 @@ export default function App() {
               onClearArchive={handleClearArchive}
             />
 
-            <div className="settings-shell neumorphic-raised">
+            <div className={`settings-shell neumorphic-raised ${settingsOpen ? "is-open" : ""}`}>
               <SettingsPanel
                 modelPath={modelPath}
                 language={language}
                 vadEnabled={status.vadEnabled}
                 hotkey={hotkey}
+                modelLoaded={status.modelLoaded}
+                isOpen={settingsOpen}
+                onToggleOpen={() => setSettingsOpen((open) => !open)}
                 captureActive={status.recording || status.continuousMode}
                 busy={busyAction !== null}
                 onModelPathChange={setModelPath}
@@ -369,7 +385,12 @@ export default function App() {
         </div>
 
         <footer className="system-message">
-          <span>{busyAction ?? ""}</span>
+          <span className="footer-dot" aria-hidden="true"></span>
+          <span>NoDaysIdle Whispering</span>
+          <span>·</span>
+          <span>{busyAction ?? activity}</span>
+          <span>·</span>
+          <span>{status.modelLoaded ? "Model ready" : "Setup required"}</span>
         </footer>
       </div>
 

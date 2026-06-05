@@ -3,6 +3,7 @@ interface ControlsProps {
   continuousMode: boolean;
   modelLoaded: boolean;
   busy: boolean;
+  hotkeyLabel: string;
   onStart: () => void;
   onStop: () => void;
   onContinuousChange: (enabled: boolean) => void;
@@ -13,6 +14,7 @@ export function Controls({
   continuousMode,
   modelLoaded,
   busy,
+  hotkeyLabel,
   onStart,
   onStop,
   onContinuousChange,
@@ -23,20 +25,24 @@ export function Controls({
   };
 
   return (
-    <div className="controls-grid">
+    <div className="controls-grid controls-primary">
       <button
-        className={`control-button record-button neumorphic-raised ${
-          recording ? "is-recording" : ""
-        }`}
+        type="button"
+        className={`record-button-primary ${recording ? "is-recording" : ""}`}
         onClick={recording ? onStop : onStart}
         disabled={!modelLoaded || busy}
         aria-label={recording ? "Stop dictation" : "Start dictation"}
       >
-        {recording ? "Stop Dictation" : "Start Dictation"}
+        <span className="record-button-primary__label">
+          {recording ? "■ Stop" : modelLoaded ? "● Record" : "Load model first"}
+        </span>
+        <span className="record-button-primary__meta">
+          {modelLoaded ? `${hotkeyLabel} push-to-talk` : "Open setup → Load Model"}
+        </span>
       </button>
 
       <div
-        className="toggle-switch"
+        className="toggle-switch continuous-toggle"
         onClick={handleToggleClick}
         role="switch"
         aria-checked={continuousMode}
@@ -50,8 +56,8 @@ export function Controls({
         }}
       >
         <div className="toggle-copy">
-          <label id="continuous-mode-label">Continuous Mode</label>
-          <span>Keep listening and split speech with VAD.</span>
+          <span id="continuous-mode-label">Continuous Mode</span>
+          <span>VAD splits long sessions automatically.</span>
         </div>
         <div className="slider-container">
           <input
