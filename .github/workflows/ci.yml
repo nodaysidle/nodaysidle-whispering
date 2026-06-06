@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    name: Verify
+    runs-on: [self-hosted, macOS]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Verify web and Rust
+        run: bash scripts/ci-local.sh verify
+
+  package:
+    name: Package macOS app
+    runs-on: [self-hosted, macOS]
+    needs: verify
+    if: github.event_name == 'push'
+    env:
+      INSTALL_DIR: ${{ github.workspace }}/.ci-install
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Package app
+        run: |
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            export ZIP_OUTPUT="$GITHUB_WORKSPACE/artifacts/NoDaysIdle-Whispering-${GITHUB_REF_NAME}.zip"
+          else
+            export ZIP_OUTPUT="$GITHUB_WORKSPACE/artifacts/NoDaysIdle-Whispering-${GITHUB_SHA::7}.zip"
+          fi
+          bash scripts/ci-local.sh package
+          test -d "$INSTALL_DIR/NoDaysIdle Whispering.app"
+          test -f "$ZIP_OUTPUT"
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nodaysidle-whispering-package
+          path: artifacts/*.zip
+          if-no-files-found: error

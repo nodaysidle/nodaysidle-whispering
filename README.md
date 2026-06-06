@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB" alt="React badge" />
   <img src="https://img.shields.io/badge/macOS-111827?logo=apple&logoColor=white" alt="macOS badge" />
   <img src="https://img.shields.io/badge/Local--first-0F172A?logo=files&logoColor=white" alt="Local-first badge" />
-  <img src="https://img.shields.io/badge/GitLab-Ready-FC6D26?logo=gitlab&logoColor=white" alt="GitLab ready badge" />
+  <img src="https://img.shields.io/badge/GitHub-Ready-181717?logo=github&logoColor=white" alt="GitHub ready badge" />
 </p>
 
 # NoDaysIdle Whispering
@@ -20,7 +20,12 @@ It is built for:
 - private local transcription
 - searchable local transcript history
 - native `.app` packaging for macOS
-- GitLab release packaging from a self-hosted macOS runner
+- GitHub release packaging from a self-hosted macOS runner
+
+## Source
+
+- Repository: https://github.com/nodaysidle/nodaysidle-whispering
+- Releases: https://github.com/nodaysidle/nodaysidle-whispering/releases
 
 ## Features
 
@@ -63,7 +68,7 @@ The model binary is intentionally ignored by git.
 - `src-tauri/icons/` — logo and app icon assets
 - `models/` — local Whisper model files, ignored by git
 - `scripts/` — local CI and macOS packaging scripts
-- `.gitlab-ci.yml` — GitLab verify/package pipeline for macOS runner
+- `.github/workflows/ci.yml` — GitHub Actions verify/package workflow for macOS runner
 
 ## Install dependencies
 
@@ -141,16 +146,16 @@ Raw Tauri app bundle output:
 src-tauri/target/release/bundle/macos/NoDaysIdle Whispering.app
 ```
 
-## GitLab CI
+## GitHub Actions
 
-The pipeline has two stages on a self-hosted macOS runner tagged `macos`:
+The workflow has two jobs on a self-hosted macOS runner:
 
-- `verify:web` — installs dependencies, builds the frontend, verifies the model path, and runs Rust tests.
-- `package:macos` — builds the native `.app`, installs it into `.ci-install/NoDaysIdle Whispering.app`, and uploads `artifacts/NoDaysIdle-Whispering-<sha-or-tag>.zip`.
+- `verify` — installs dependencies, builds the frontend, verifies the model path, and runs Rust tests.
+- `package` — builds the native `.app`, installs it into `.ci-install/NoDaysIdle Whispering.app`, and uploads `artifacts/NoDaysIdle-Whispering-<sha-or-tag>.zip`.
 
 Model handling:
 - If `models/ggml-base.en-q5_1.bin` exists in the checkout, CI uses it.
-- If the model is stored outside the checkout, set `WHISPER_MODEL_PATH` in GitLab CI/CD variables.
+- If the model is stored outside the checkout, set `WHISPER_MODEL_PATH` in the runner environment.
 - The repo does not hardcode machine-specific model paths.
 
 Local equivalent:
@@ -159,7 +164,7 @@ Local equivalent:
 npm run ci:local
 ```
 
-GitLab.com may block pipeline execution until the account completes identity verification. Until that gate is cleared, `npm run ci:local` is the reliable fallback on the Mac mini.
+If the self-hosted runner is unavailable, `npm run ci:local` is the reliable fallback on the Mac mini.
 
 ## Configuration
 

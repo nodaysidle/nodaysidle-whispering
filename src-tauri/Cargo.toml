@@ -2,7 +2,7 @@
 name = "nodaysidle-whispering"
 version = "0.1.0"
 description = "Low-latency local dictation powered by Tauri, cpal, WebRTC VAD, and whisper.cpp"
-authors = ["archuser"]
+authors = ["NODAYSIDLE"]
 edition = "2021"
 
 [lib]
