@@ -8,3 +8,4 @@ models/.cache/
 .DS_Store
 *.log
 artifacts/
+release/
