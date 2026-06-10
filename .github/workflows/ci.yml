@@ -10,7 +10,7 @@ on:
 jobs:
   verify:
     name: Verify
-    runs-on: [self-hosted, macOS]
+    runs-on: macos-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -20,6 +20,11 @@ jobs:
         with:
           node-version: "20"
           cache: npm
+
+      - name: Provide CI smoke-test model placeholder
+        run: |
+          mkdir -p models
+          : > models/ggml-base.en-q5_1.bin
 
       - name: Verify web and Rust
         run: bash scripts/ci-local.sh verify
