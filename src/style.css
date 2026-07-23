@@ -2,24 +2,24 @@
 
 :root {
     color-scheme: dark;
-    --color-base: #17191e;
-    --color-base-strong: #111318;
-    --color-surface: rgba(28, 31, 38, 0.92);
-    --color-surface-strong: rgba(20, 23, 29, 0.98);
+    --color-base: #0A0A0F;
+    --color-base-strong: #08080C;
+    --color-surface: #14141F;
+    --color-surface-strong: #0E0E15;
     --color-shadow-dark: rgba(0, 0, 0, 0.42);
     --color-highlight-light: rgba(255, 255, 255, 0.035);
     --color-border: rgba(255, 255, 255, 0.06);
-    --color-text-primary: #f3f5f7;
-    --color-text-secondary: #a2a8b3;
-    --color-accent: #c8ff00;
+    --color-text-primary: #F0F0F5;
+    --color-text-secondary: #6B6B80;
+    --color-accent: #C8FF00;
     --color-accent-dark: #9ccc00;
     --color-success: #70f08a;
     --color-error: #ff6767;
 
     --font-family:
-        ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI",
-        Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-    --border-radius: 18px;
+        ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+    --border-radius: 12px;
     --transition-speed: 200ms;
 }
 
@@ -31,10 +31,7 @@
 }
 
 body {
-    background:
-        radial-gradient(circle at top left, rgba(200, 255, 0, 0.10), transparent 24%),
-        radial-gradient(circle at top right, rgba(200, 255, 0, 0.05), transparent 28%),
-        linear-gradient(180deg, var(--color-base-strong), var(--color-base));
+    background: var(--color-base);
     color: var(--color-text-primary);
     font-family: var(--font-family);
     min-height: 100vh;
@@ -86,24 +83,18 @@ fieldset {
 
 /* NEUMORPHIC STYLES */
 .neumorphic-raised {
-    background: linear-gradient(180deg, var(--color-surface), rgba(24, 27, 33, 0.96));
+    background: var(--color-surface);
     border-radius: var(--border-radius);
     border: 1px solid var(--color-border);
-    box-shadow:
-        0 12px 28px var(--color-shadow-dark),
-        inset 0 1px 0 rgba(255, 255, 255, 0.04);
     transition:
         transform var(--transition-speed) ease-out,
         box-shadow var(--transition-speed) ease-out;
 }
 
 .neumorphic-pressed {
-    background: linear-gradient(180deg, rgba(16, 18, 23, 0.96), rgba(27, 30, 37, 0.98));
+    background: var(--color-surface-strong);
     border-radius: var(--border-radius);
     border: 1px solid rgba(255, 255, 255, 0.03);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.035),
-        inset 0 -18px 30px rgba(0, 0, 0, 0.22);
     transition: box-shadow var(--transition-speed) ease-out;
 }
 
@@ -218,16 +209,6 @@ fieldset {
     text-align: center;
     letter-spacing: -0.01em;
 }
-.control-button:hover {
-    box-shadow:
-        8px 8px 16px var(--color-shadow-dark),
-        -8px -8px 16px var(--color-highlight-light);
-}
-.control-button:active {
-    box-shadow:
-        inset 6px 6px 12px var(--color-shadow-dark),
-        inset -6px -6px 12px var(--color-highlight-light);
-}
 .control-button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -236,9 +217,6 @@ fieldset {
 
 .control-button.record-button.is-recording {
     color: var(--color-error);
-    box-shadow:
-        inset 6px 6px 12px var(--color-shadow-dark),
-        inset -6px -6px 12px var(--color-highlight-light);
 }
 
 .toggle-switch {
@@ -262,9 +240,6 @@ fieldset {
     height: 28px;
     position: relative;
     border-radius: 14px;
-    box-shadow:
-        inset 4px 4px 8px var(--color-shadow-dark),
-        inset -4px -4px 8px var(--color-highlight-light);
 }
 
 .toggle-switch .slider::before {
@@ -277,9 +252,6 @@ fieldset {
     border-radius: 50%;
     background-color: var(--color-text-secondary);
     transition: transform var(--transition-speed) ease;
-    box-shadow:
-        3px 3px 6px var(--color-shadow-dark),
-        -3px -3px 6px var(--color-highlight-light);
 }
 
 .toggle-switch input:checked + .slider::before {
@@ -409,12 +381,6 @@ fieldset {
     padding: 0.75rem 1rem;
     width: 100%;
 }
-.field-group input[type="text"],
-.field-group select {
-    box-shadow:
-        inset 4px 4px 8px var(--color-shadow-dark),
-        inset -4px -4px 8px var(--color-highlight-light);
-}
 
 .settings-panel .settings-button {
     padding: 0.75rem;
@@ -426,9 +392,6 @@ fieldset {
     background-color: var(--color-accent-dark);
 }
 .settings-panel .settings-button:active {
-    box-shadow:
-        inset 6px 6px 12px var(--color-shadow-dark),
-        inset -6px -6px 12px var(--color-highlight-light);
     background: var(--color-accent);
 }
 
@@ -691,10 +654,6 @@ fieldset {
     background: rgba(255, 214, 102, 0.08);
 }
 
-.vault-pill.is-live {
-    box-shadow: 0 0 22px rgba(200, 255, 0, 0.16);
-}
-
 .transcript-view {
     max-height: min(58vh, 620px);
     overflow: auto;
@@ -823,22 +782,12 @@ fieldset {
     color: var(--color-accent);
     font-weight: 800;
     letter-spacing: -0.045em;
-    text-shadow: 0 0 24px rgba(200, 255, 0, 0.18);
 }
 
 .command-header {
     position: relative;
     overflow: hidden;
     padding: 1.35rem 1.55rem;
-}
-
-.command-header::after {
-    content: "";
-    position: absolute;
-    inset: auto -10% -55% 38%;
-    height: 150px;
-    background: radial-gradient(circle, rgba(200, 255, 0, 0.13), transparent 65%);
-    pointer-events: none;
 }
 
 .header h1 {
@@ -856,7 +805,6 @@ fieldset {
     border-color: rgba(200, 255, 0, 0.12);
     box-shadow:
         0 20px 42px rgba(0, 0, 0, 0.34),
-        0 0 42px rgba(200, 255, 0, 0.06),
         inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
@@ -869,7 +817,7 @@ fieldset {
     padding: 1rem;
     border-radius: calc(var(--border-radius) - 4px);
     border: 1px solid rgba(200, 255, 0, 0.16);
-    background: linear-gradient(135deg, rgba(200, 255, 0, 0.11), rgba(255, 255, 255, 0.025));
+    background: var(--color-surface);
 }
 
 .first-run-card h2 {
@@ -892,7 +840,6 @@ fieldset {
     background: var(--color-accent);
     font-weight: 800;
     white-space: nowrap;
-    box-shadow: 0 0 26px rgba(200, 255, 0, 0.18);
 }
 
 .controls-grid.controls-primary {
@@ -910,10 +857,8 @@ fieldset {
     padding: 1.35rem 1.5rem;
     border-radius: var(--border-radius);
     color: var(--color-base-strong);
-    background: linear-gradient(135deg, var(--color-accent), #9ed900);
-    box-shadow:
-        0 0 34px rgba(200, 255, 0, 0.22),
-        inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    background: var(--color-accent);
+    box-shadow: none;
     transition:
         transform var(--transition-speed) ease,
         box-shadow var(--transition-speed) ease,
@@ -922,22 +867,21 @@ fieldset {
 
 .record-button-primary:hover:not(:disabled) {
     transform: translateY(-2px) scale(1.01);
-    box-shadow: 0 0 52px rgba(200, 255, 0, 0.31);
 }
 
 .record-button-primary:disabled {
     cursor: not-allowed;
     color: var(--color-text-secondary);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.02));
+    background: var(--color-surface-strong);
     border: 1px solid rgba(255, 255, 255, 0.055);
     opacity: 1;
     filter: none;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    box-shadow: none;
 }
 
 .record-button-primary.is-recording {
     color: #fff;
-    background: linear-gradient(135deg, var(--color-error), #b92424);
+    background: var(--color-error);
     animation: recording-pulse 1.5s ease-in-out infinite;
 }
 
@@ -1006,8 +950,7 @@ fieldset {
     height: 88px;
     border-radius: 999px;
     border: 1px solid rgba(200, 255, 0, 0.12);
-    background: radial-gradient(circle, rgba(200, 255, 0, 0.1), rgba(255, 255, 255, 0.025));
-    box-shadow: inset 0 0 34px rgba(0, 0, 0, 0.18);
+    background: var(--color-surface);
 }
 
 .waveform-mark span {
@@ -1122,7 +1065,6 @@ fieldset {
     height: 7px;
     border-radius: 999px;
     background: var(--color-accent);
-    box-shadow: 0 0 14px rgba(200, 255, 0, 0.5);
 }
 
 .workbench > * {
