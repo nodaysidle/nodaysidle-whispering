@@ -1,3 +1,5 @@
+<img src=".github/social-preview.png" alt="NoDaysIdle Whispering — NODAYSIDLE" width="100%">
+
 # NoDaysIdle Whispering
 
 > Local-first macOS dictation with a native Tauri shell, Rust audio/transcription backend, and React transcript vault.
